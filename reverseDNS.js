@@ -70,39 +70,59 @@ function reverseDNS2IP4(reverseDNS) {
   return ip;
 }
 
+// IPv6アドレスの正規表現
+const ipv6Regex = /^([0-9a-fA-F]{1,4}:){7}[0-9a-fA-F]{1,4}$/;
+
+// IPv4アドレスの正規表現
+const ipv4Regex = /^(\d{1,3}\.){3}\d{1,3}$/;
+
 // IPアドレスを逆引きDNS レコードに変換する関数を定義する
 function IP2reverseDNS(ip) {
-  // IPアドレスを":"で分割する
-  var groups = ip.split(":");
+  // IPv6アドレスに合致するかチェック
+  if (ipv6Regex.test(ip)) {
+    // IPアドレスを分割する
+    var groups = ip.split(":");
 
-  // 各グループを4桁にする
-  for (var i = 0; i < groups.length; i++) {
-    var group = groups[i];
-    while (group.length < 4) {
-      group = "0" + group;
+    // 各グループを4桁にする
+    for (var i = 0; i < groups.length; i++) {
+      var group = groups[i];
+      while (group.length < 4) {
+        group = "0" + group;
+      }
+      groups[i] = group;
     }
-    groups[i] = group;
+
+    // IPアドレスを再結合する
+    ip = groups.join("");
+
+    // IPアドレスを逆順にする
+    ip = ip.split("").reverse().join("");
+
+    // IPアドレスの各桁をドットで区切る
+    ip = ip.replace(/(.)/g, "$1.");
+
+    // 末尾のドットを削除する
+    ip = ip.slice(0, -1);
+
+    // ip6.arpaを追加する
+    return ip + ".ip6.arpa";
   }
+  // IPv4アドレスに合致するかチェック
+  else if (ipv4Regex.test(ip)) {
+    // IPアドレスを分割する
+    var groups = ip.split(".");
 
-  // IPアドレスを再結合する
-  ip = groups.join(":");
+    // IPアドレスを逆順にする
+    groups = groups.reverse();
 
-  // IPアドレスを逆順にする
-  ip = ip.split("").reverse().join("");
+    // IPアドレスを再結合する
+    ip = groups.join(".");
 
-  // IPアドレスに".ip6.arpa"または".in-addr.arpa"を付ける
-  var reverseDNS;
-  if (groups.length == 8) {
-    // IPv6の場合
-    reverseDNS = ip + ".ip6.arpa";
-  } else if (groups.length == 4) {
-    // IPv4の場合
-    reverseDNS = ip + ".in-addr.arpa";
-  } else {
-    // 不正なIPアドレスの場合
-    reverseDNS = "不正なIPアドレスです。";
+    // in-addr.arpaを追加する
+    return ip + ".in-addr.arpa";
   }
-
-  // 逆引きDNS レコードを返す
-  return reverseDNS;
+  // どちらでもない場合
+  else {
+    return "不正なIPアドレスです。";
+  }
 }
