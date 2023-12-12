@@ -16,10 +16,10 @@ button.onclick = function() {
     // 空でない場合は、入力欄の値が逆引きDNS レコードかIPアドレスか判定する
     if (value.endsWith(".ip6.arpa")) {
       // IPv6の逆引きDNS レコードの場合は、IPアドレスに変換する
-      output.value = reverseDNS2IP6(value);
+      output.value = reverseDNS2IP(value, true);
     } else if (value.endsWith(".in-addr.arpa")) {
       // IPv4の逆引きDNS レコードの場合は、IPアドレスに変換する
-      output.value = reverseDNS2IP4(value);
+      output.value = reverseDNS2IP(value, false);
     } else {
       // IPアドレスの場合は、逆引きDNS レコードに変換する
       output.value = IP2reverseDNS(value);
@@ -27,33 +27,8 @@ button.onclick = function() {
   }
 };
 
-// IPv6の逆引きDNS レコードをIPアドレスに変換する関数を定義する
-function reverseDNS2IP6(reverseDNS) {
-  // レコードを"."で分割する
-  var parts = reverseDNS.split(".");
-
-  // 最初の8つの要素を除く
-  parts = parts.slice(0, -8);
-
-  // 逆順にする
-  parts = parts.reverse();
-
-  // 4つずつグループにする
-  var groups = [];
-  for (var i = 0; i < parts.length; i += 4) {
-    var group = parts.slice(i, i + 4).join("");
-    groups.push(group);
-  }
-
-  // グループを":"で結合する
-  var ip = groups.join(":");
-
-  // IPアドレスを返す
-  return ip;
-}
-
-// IPv4の逆引きDNS レコードをIPアドレスに変換する関数を定義する
-function reverseDNS2IP4(reverseDNS) {
+// 逆引きDNS レコードをIPアドレスに変換する関数を定義する
+function reverseDNS2IP(reverseDNS, IP6) {
   // レコードを"."で分割する
   var parts = reverseDNS.split(".");
 
@@ -63,8 +38,24 @@ function reverseDNS2IP4(reverseDNS) {
   // 逆順にする
   parts = parts.reverse();
 
-  // グループを"."で結合する
-  var ip = parts.join(".");
+  if(IP6){
+    //IPv6の時実行
+
+	  // 4つずつグループにする
+	  var groups = [];
+	  for (var i = 0; i < parts.length; i += 4) {
+	    var group = parts.slice(i, i + 4).join("");
+	    groups.push(group);
+	  }
+	
+	  // グループを":"で結合する
+	  var ip = groups.join(":");
+	} else {
+    //IPv4の時実行
+    
+	  // グループを"."で結合する
+	  var ip = parts.join(".");
+  }
 
   // IPアドレスを返す
   return ip;
