@@ -47,12 +47,18 @@ function reverseDNS2IP(reverseDNS, IP6) {
 	    var group = parts.slice(i, i + 4).join("");
 	    groups.push(group);
 	  }
+
+    for(var i in groups) {
+      let index = 0;
+      while (index < 3 && groups[i].charAt(index)==='0') index++;
+      groups[i] = groups[i].slice(index)
+    };
 	
 	  // グループを":"で結合する
 	  var ip = groups.join(":");
 	} else {
     //IPv4の時実行
-    
+
 	  // グループを"."で結合する
 	  var ip = parts.join(".");
   }
